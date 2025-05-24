@@ -391,7 +391,7 @@
             // Обложка
             const coverImg = document.getElementById('book-cover');
             if (book.images && book.images.length > 0) {
-                coverImg.src = 'https://volshebnik.uz/site' + book.images[0].image ?? '';
+                coverImg.src = 'https://volshebnik.uz' + book.images[0].image ?? '';
                 coverImg.alt = `Обложка книги "${book.title}"`;
             } else {
                 coverImg.src = 'https://via.placeholder.com/400x600?text=Нет+изображения';
@@ -404,7 +404,7 @@
             if (book.images && book.images.length > 1) {
                 book.images.forEach((src, index) => {
                     const thumb = document.createElement('img');
-                    thumb.src = 'https://volshebnik.uz/site' + src.image;
+                    thumb.src = 'https://volshebnik.uz' + src.image;
                     thumb.alt = `Миниатюра ${index + 1} книги "${book.title}"`;
                     thumb.className = index === 0 ? 'rounded-lg cursor-pointer active' : 'rounded-lg cursor-pointer';
                     thumb.width = 80;
@@ -412,11 +412,11 @@
                     thumb.tabIndex = 0;
                     thumb.setAttribute('role', 'button');
                     thumb.setAttribute('aria-pressed', index === 0 ? 'true' : 'false');
-                    thumb.addEventListener('click', () => switchCoverImage('https://volshebnik.uz/site' +src.image, index, thumbsContainer));
+                    thumb.addEventListener('click', () => switchCoverImage('https://volshebnik.uz' +src.image, index, thumbsContainer));
                     thumb.addEventListener('keypress', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            switchCoverImage('https://volshebnik.uz/site' +src.image, index, thumbsContainer);
+                            switchCoverImage('https://volshebnik.uz' +src.image, index, thumbsContainer);
                         }
                     });
                     thumbsContainer.appendChild(thumb);
