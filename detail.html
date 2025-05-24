@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Volshebnik Books — Детали книги</title>
+    <meta name="description"
+        content="Подробная информация о книге в Volshebnik Books — описание, автор, цена и отзывы." />
+    <meta name="keywords" content="книги, детали книги, Volshebnik Books, доставка книг, купить книгу" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://volshebnik.uz/book-details" />
+    <link rel="icon" href="https://volshebnik.uz/favicon.ico" type="image/x-icon" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Volshebnik Books — Детали книги" />
+    <meta property="og:description"
+        content="Подробная информация о книге в Volshebnik Books — описание, автор, цена и отзывы." />
+    <meta property="og:url" content="https://volshebnik.uz/book-details" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1512820790803-83ca734da794" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Volshebnik Books — Детали книги" />
+    <meta name="twitter:description"
+        content="Подробная информация о книге в Volshebnik Books — описание, автор, цена и отзывы." />
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1512820790803-83ca734da794" />
+
+    <!-- Стили и библиотеки -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgb(37 99 235 / 0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 60;
+        }
+
+        @media (min-width: 768px) {
+            #scrollTopBtn {
+                width: 48px;
+                height: 48px;
+                bottom: 3rem;
+                right: 3rem;
+            }
+        }
+
+        #scrollTopBtn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Плавная смена обложки */
+        #book-cover {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #gallery-thumbs img {
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        #gallery-thumbs img.active {
+            border-color: #2563eb;
+        }
+
+        /* Отзывы с рейтингом */
+        .review-rating {
+            color: #fbbf24;
+            /* Желтый цвет звезд */
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Лоадер */
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #2563eb;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 flex min-h-screen flex-col">
+
+    <!-- Хедер -->
+    <header
+        class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm flex justify-between items-center px-3 sm:px-6 py-3 z-40">
+        <div class="flex items-center space-x-3">
+            <h1 class="text-xl font-semibold text-gray-800 cursor-pointer" onclick="location.href='./index.html'"
+                tabindex="0" role="link" aria-label="На главную Volshebnik Books">
+                Volshebnik Books
+            </h1>
+        </div>
+        <nav class="hidden md:flex space-x-6 text-sm text-gray-600" aria-label="Контактная информация">
+            <div>📞 <a href="tel:+998901234567" class="hover:underline">+998 90 123 45 67</a></div>
+            <div>✉ <a href="mailto:info@volshebnik.uz" class="hover:underline">info@volshebnik.uz</a></div>
+            <div>🏢 Ташкент, Узбекистан</div>
+        </nav>
+    </header>
+
+    <!-- Основной контент -->
+    <main class="pt-20 max-w-7xl mx-auto p-2 sm:p-4 md:p-6 flex-grow mt-16" role="main">
+        <div id="loader" class="loader" aria-label="Загрузка данных книги" role="status"></div>
+
+        <div id="content" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10" aria-live="polite">
+            <!-- Галерея с обложкой и миниатюрами -->
+            <section aria-label="Галерея изображений книги"
+                class="flex flex-col justify-center items-center bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                <img id="book-cover" src="https://via.placeholder.com/400x600?text=Загрузка..." alt="Обложка книги"
+                    class="rounded-lg max-h-[400px] object-contain mb-4" />
+
+                <div id="gallery-thumbs" class="flex space-x-3 overflow-x-auto max-w-full" tabindex="0">
+                    <!-- Миниатюры будут добавлены сюда скриптом -->
+                </div>
+            </section>
+
+            <!-- Информация о книге -->
+            <section
+                class="bg-white rounded-xl shadow-lg p-4 sm:p-6 flex flex-col justify-between max-w-full sm:max-w-[600px]"
+                aria-label="Информация о книге">
+                <div>
+                    <h2 id="book-title" class="text-3xl font-bold mb-3 text-gray-900">Загрузка...</h2>
+                    <p class="text-gray-600 mb-2">Автор: <span id="book-author" class="font-semibold">–</span></p>
+                    <p class="text-gray-600 mb-2">Жанр: <span id="book-genre" class="font-semibold">–</span></p>
+                    <p class="text-gray-600 mb-2">Издательство: <span id="book-publisher" class="font-semibold">–</span>
+                    </p>
+                    <p class="text-gray-600 mb-2">Год издания: <span id="book-year" class="font-semibold">–</span></p>
+                    <p class="text-gray-600 mb-6">ISBN: <span id="book-isbn" class="font-semibold">–</span></p>
+
+                    <h3 class="text-xl font-semibold mb-2">Описание</h3>
+                    <p id="book-description" class="text-gray-700 leading-relaxed mb-6">Загрузка описания...</p>
+                </div>
+
+                <!-- Цена и кнопка -->
+                <div class="mt-auto">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-6 mb-4">
+                        <div id="book-price" class="text-2xl font-bold text-blue-600 mb-3 sm:mb-0">–</div>
+                        <button id="add-to-cart"
+                            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                            disabled aria-disabled="true" aria-label="Добавить книгу в корзину">
+                            В корзину
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-500">Доставка по всему Узбекистану — 1-3 дня</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Отзывы -->
+        <section class="mt-16 px-2 sm:px-0" aria-label="Отзывы о книге">
+            <h2 class="text-3xl font-bold text-blue-800 mb-10 text-center">Отзывы о книге</h2>
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper" id="reviews-container">
+                    <!-- Отзывы будут динамически добавлены сюда -->
+                </div>
+
+                <!-- Навигация -->
+                <button class="swiper-button-prev !text-blue-600" aria-label="Предыдущий отзыв"></button>
+                <button class="swiper-button-next !text-blue-600" aria-label="Следующий отзыв"></button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer class="bg-gray-100 border-t border-gray-300 py-8 px-4 sm:px-6 text-gray-700 text-sm md:text-base mt-auto"
+        role="contentinfo">
+        <div
+            class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start space-y-6 md:space-y-0">
+            <div>
+                <h3 class="font-semibold mb-2 text-gray-900">Volshebnik Books</h3>
+                <p class="max-w-xl">
+                    Интернет-магазин книг с доставкой по Ташкенту и Узбекистану. Мы предлагаем лучшие книги, новинки и
+                    выгодные акции.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-2 text-gray-900">Контакты</h4>
+                <ul>
+                    <li>
+                        Телефон:
+                        <a href="tel:+998901234567" class="hover:underline">+998 90 123 45 67</a>
+                    </li>
+                    <li>
+                        Email:
+                        <a href="mailto:info@volshebnik.uz" class="hover:underline">info@volshebnik.uz</a>
+                    </li>
+                    <li>Адрес: Ташкент, Узбекистан</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Кнопка прокрутки вверх -->
+    <button id="scrollTopBtn" aria-label="Наверх" title="Наверх" tabindex="0">
+        ↑
+    </button>
+
+    <script>
+        // Функция форматирования цены (с пробелами)
+        function formatPrice(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " сум";
+        }
+
+        // Локальное сохранение корзины
+        function saveToCart(book) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            // Проверяем, есть ли книга в корзине
+            if (cart.find(item => item.id === book.id)) {
+                alert('Эта книга уже в корзине');
+                return;
+            }
+            cart.push(book);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Книга добавлена в корзину!');
+        }
+
+        // Показ кнопки "Наверх" при скролле
+        const scrollBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                scrollBtn.classList.add('show');
+            } else {
+                scrollBtn.classList.remove('show');
+            }
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Функция получения параметров URL
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Отрисовка отзывов с рейтингом
+        function renderReviews(reviews) {
+            const container = document.getElementById('reviews-container');
+            container.innerHTML = ''; // очистить
+
+            reviews.forEach(review => {
+                const starsCount = Math.min(5, Math.max(1, review.rating)); // от 1 до 5
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += i <= starsCount ? '★' : '☆';
+                }
+
+                const reviewEl = document.createElement('div');
+                reviewEl.className = 'swiper-slide bg-white rounded-lg shadow p-6 max-w-md mx-auto';
+                reviewEl.innerHTML = `
+                    <div class="review-rating" aria-label="Рейтинг ${starsCount} из 5">${starsHtml}</div>
+                    <p class="text-gray-800 italic mb-4">"${review.comment}"</p>
+                    <p class="text-gray-600 font-semibold text-right">— ${review.author}</p>
+                `;
+                container.appendChild(reviewEl);
+            });
+
+            // Инициализация Swiper после добавления слайдов
+            new Swiper('.mySwiper', {
+                loop: true,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                slidesPerView: 1,
+                autoHeight: true,
+            });
+        }
+
+        async function loadBookData(slug) {
+            const loader = document.getElementById('loader');
+            const content = document.getElementById('content');
+
+            loader.style.display = 'block';
+            content.classList.add('hidden');
+
+            try {
+                if (!slug) {
+                    throw new Error('Не указан параметр книги');
+                }
+
+                // Формируем URL с учётом твоего API
+                const apiUrl = `https://volshebnik.uz/api/products/${encodeURIComponent(slug)}`;
+
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Книга не найдена');
+                }
+                const data = await response.json();
+
+                // В твоём API структура может отличаться — надо подстроиться
+                // Пример предполагаемой структуры:
+                /*
+                {
+                  id: string,
+                  title: string,
+                  author: string,
+                  genre: string,
+                  publisher: string,
+                  year: number,
+                  isbn: string,
+                  description: string,
+                  price: number,
+                  images: [string],
+                  reviews: [
+                    { author: string, comment: string, rating: number }
+                  ]
+                }
+                */
+
+                // Проверим и подготовим объект книги для отрисовки
+                const book = {
+                    id: data.id || slug,
+                    title: data.title || 'Название отсутствует',
+                    author: data.author || 'Автор неизвестен',
+                    genre: data.genre || 'Жанр неизвестен',
+                    publisher: data.publisher || 'Издатель неизвестен',
+                    year: data.year || 'Год неизвестен',
+                    isbn: data.isbn || 'ISBN отсутствует',
+                    description: data.description || 'Описание отсутствует',
+                    price: data.price || 0,
+                    images: data.images && data.images.length ? data.images : ['https://via.placeholder.com/400x600?text=Нет+изображения'],
+                    reviews: data.reviews || []
+                };
+
+                fillBookDetails(book);
+
+            } catch (error) {
+                console.warn('Ошибка при загрузке данных:', error.message);
+
+            } finally {
+                loader.style.display = 'none';
+                content.classList.remove('hidden');
+            }
+        }
+        // Заполняем детали книги на странице
+        function fillBookDetails(book) {
+            // Заголовок и инфо
+            document.getElementById('book-title').textContent = book.title;
+            document.getElementById('book-author').textContent = book.author;
+            document.getElementById('book-genre').textContent = book.genre;
+            document.getElementById('book-publisher').textContent = book.publisher;
+            document.getElementById('book-year').textContent = book.year;
+            document.getElementById('book-isbn').textContent = book.isbn;
+            document.getElementById('book-description').textContent = book.description;
+
+            // Цена и кнопка
+            const priceEl = document.getElementById('book-price');
+            const addToCartBtn = document.getElementById('add-to-cart');
+            priceEl.textContent = formatPrice(book.price);
+            addToCartBtn.disabled = false;
+            addToCartBtn.setAttribute('aria-disabled', 'false');
+
+            // Обложка
+            const coverImg = document.getElementById('book-cover');
+            if (book.images && book.images.length > 0) {
+                coverImg.src = 'https://volshebnik.uz' + book.images[0].image ?? '';
+                coverImg.alt = `Обложка книги "${book.title}"`;
+            } else {
+                coverImg.src = 'https://via.placeholder.com/400x600?text=Нет+изображения';
+                coverImg.alt = 'Обложка отсутствует';
+            }
+
+            // Галерея миниатюр
+            const thumbsContainer = document.getElementById('gallery-thumbs');
+            thumbsContainer.innerHTML = '';
+            if (book.images && book.images.length > 1) {
+                book.images.forEach((src, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = 'https://volshebnik.uz' + src.image;
+                    thumb.alt = `Миниатюра ${index + 1} книги "${book.title}"`;
+                    thumb.className = index === 0 ? 'rounded-lg cursor-pointer active' : 'rounded-lg cursor-pointer';
+                    thumb.width = 80;
+                    thumb.height = 120;
+                    thumb.tabIndex = 0;
+                    thumb.setAttribute('role', 'button');
+                    thumb.setAttribute('aria-pressed', index === 0 ? 'true' : 'false');
+                    thumb.addEventListener('click', () => switchCoverImage('https://volshebnik.uz' +src.image, index, thumbsContainer));
+                    thumb.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            switchCoverImage('https://volshebnik.uz' +src.image, index, thumbsContainer);
+                        }
+                    });
+                    thumbsContainer.appendChild(thumb);
+                });
+            }
+
+            // Отзывы
+            if (book.reviews && book.reviews.length > 0) {
+                renderReviews(book.reviews);
+            } else {
+                document.getElementById('reviews-container').innerHTML = '<p class="text-center text-gray-500">Отзывов пока нет.</p>';
+            }
+
+            // Кнопка добавления в корзину
+            addToCartBtn.onclick = () => saveToCart({
+                id: book.id,
+                title: book.title,
+                author: book.author,
+                price: book.price,
+                cover: book.images ? book.images[0] : ''
+            });
+        }
+
+        // Смена основной обложки по клику
+        function switchCoverImage(src, index, container) {
+            const coverImg = document.getElementById('book-cover');
+            // Плавно скрываем
+            coverImg.style.opacity = '0';
+            setTimeout(() => {
+                coverImg.src = src;
+                coverImg.style.opacity = '1';
+            }, 300);
+
+            // Обновляем активный класс у миниатюр
+            [...container.children].forEach((img, i) => {
+                img.classList.toggle('active', i === index);
+                img.setAttribute('aria-pressed', i === index ? 'true' : 'false');
+            });
+        }
+
+        // Загрузка данных после загрузки страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            const slug = getQueryParam('id') || 'test-book-001';
+            loadBookData(slug);
+        });
+    </script>
+</body>
+
+</html>
