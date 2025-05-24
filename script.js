@@ -145,7 +145,7 @@ function renderProductsPage(page = 1, products = allProducts) {
 
         if (product.preview) {
             const img = document.createElement('img');
-            img.src = product.preview.startsWith('/') ? `https://volshebnik.uz${product.preview}` : product.preview;
+            img.src = product.preview.startsWith('/') ? `https://volshebnik.uz/site${product.preview}` : product.preview;
             img.alt = product.title;
             img.className = 'w-full h-56 object-cover mb-4 rounded-md';
             card.appendChild(img);
@@ -245,7 +245,7 @@ searchInput.addEventListener('input', (e) => {
     filterProductsBySlug(currentSlug);
 });
 
-fetch('https://volshebnik.uz/api/products/all/')
+fetch('https://volshebnik.uz/site/api/products/all/')
     .then(res => res.json())
     .then(data => {
         allProducts = data;
@@ -255,7 +255,7 @@ fetch('https://volshebnik.uz/api/products/all/')
         productsList.innerHTML = '<p class="text-red-500 text-center">Не удалось загрузить книги</p>';
     });
 
-fetch('https://volshebnik.uz/api/categories/')
+fetch('https://volshebnik.uz/site/api/categories/')
     .then(res => res.json())
     .then(categories => {
         categoriesMenu.innerHTML = '';
